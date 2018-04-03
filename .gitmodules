@@ -1,6 +1,8 @@
 [submodule "gym-rle"]
 	path = gym-rle
 	url = https://github.com/samoooop/gym-rle.git
+	ignore = dirty
 [submodule "Retro-Learning-Environment"]
 	path = Retro-Learning-Environment
 	url = https://github.com/samoooop/Retro-Learning-Environment.git
+	ignore = dirty
