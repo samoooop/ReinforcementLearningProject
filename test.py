@@ -13,10 +13,11 @@ import gym
 import gym_rle
 from baselines.common.atari_wrappers import wrap_deepmind, make_atari, MaxAndSkipEnv
 from baselines import bench
+from baselines import deepq
 
 from baselines.common import set_global_seeds
 from wrapper import *
-
+from realtime_env import RealtimeEnv
 import numpy as np
 
 def make_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0):
@@ -36,20 +37,30 @@ def make_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0):
             return env
         return _thunk
     set_global_seeds(seed)
-    return SubprocVecEnv([make_env(i + start_index) for i in range(num_env)])
+    return RealtimeEnv([make_env(i + start_index) for i in range(num_env)])
 
-env = make_env('GradiusIiiDeterministic-v0', 6, 0)
-# env = gym.make('GradiusIiiDeterministic-v0')
+# env = make_env('GradiusIiiDeterministic-v0', 12, 0)
+env = gym.make('GradiusIii-v0')
 # env = StateSaver2(env, load_chance = 0.5)
 # env = EpisodicWrapper(env)
 # env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
 # env = MaxAndSkipEnv(env, skip=4)
 # env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
-env.reset()
+obs = env.reset()
+# obs, rews, dones, infos = env.step(np.zeros(12, dtype = np.int))
+frame_count = 0
+# act = deepq.load("result/10mstep4stack7261random.pkl")
 for i in range(1000):
-    # obs, _, dones, _, = env.step(0)
-    actions = np.random.random_integers(size=(8,), low = 0, high = 19)
-    obs, rews, dones, infos = env.step(actions)
-    print(obs.shape, i, dones, actions)
-    # if dones:
-    #     env.reset()
+    # actions = np.random.random_integers(size=(obs.shape[0],), low = 0, high = 19)
+    # print(obs.shape)
+    #actions = act(obs[None])
+    # print(actions)
+#     obs, rews, dones, infos = env.step(actions)
+#     frame_count += obs.shape[0]
+#     print(obs.shape, i, dones, actions)
+    
+    obs, _, dones, _, = env.step(0)
+    print(i, dones, obs.shape)
+    if dones:
+        obs = env.reset()
+print(frame_count)

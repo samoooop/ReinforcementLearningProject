@@ -221,7 +221,8 @@ def learn(env,
         model_saved = False
         model_file = os.path.join(td, "model")
         print("saving to ", model_file)
-        for t in range(max_timesteps):
+        t = 0
+        while t < max_timesteps:
             if callback is not None:
                 if callback(locals(), globals()):
                     break
@@ -246,19 +247,20 @@ def learn(env,
             env_actions = actions
             reset = False
             #print('s')
-            new_obss, rews, dones, _ = env.step(env_actions)
+            results = env.step(env_actions)
             #print('e')
             # print(len(episode_rewards))
             # Store transition in the replay buffer.
-            for i in range(nenv):
-                replay_buffer.add(obs[i], actions[i], rews[i], new_obss[i], float(dones[i]))
-                current_episode_rewards[i] += rews[i]
-                if dones[i]:
-                    episode_rewards.append(current_episode_rewards[i])
-                    current_episode_rewards[i] = 0
+            any_done = False
+            for result in results:
+                ob, action, rew, new_ob, done, total_rew = result
+                replay_buffer.add(ob, action, rew, new_ob, done)
+                if done:
+                    episode_rewards.append(total_rew)
                     reset = True
-            done = np.any(dones)
-            obs = new_obss
+                    any_done = True
+            t += len(results)
+            done = any_done
 
             if t > learning_starts and t % train_freq == 0:
                 # Minimize the error in Bellman's equation on a batch sampled from replay buffer.
