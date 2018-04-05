@@ -27,12 +27,12 @@ class EpisodicWrapper(gym.Wrapper):
         return obs, reward, done, info
     
     # TODO Recheck logic!
-    def _reset(self, **kwargs):
-        if self.lives <= 0:
-            obs = self.env.reset(**kwargs)
-        else:
-            obs, _, _, _ = self.env.step(0)
-        return obs
+    # def _reset(self, **kwargs):
+    #     if self.lives <= 0:
+    #         obs = self.env.reset(**kwargs)
+    #     else:
+    #         obs, _, _, _ = self.env.step(0)
+    #     return obs
 
 class StateSaver(gym.Wrapper):
     def __init__(self, env):
@@ -92,7 +92,7 @@ class StateSaver2(gym.Wrapper):
     def _reset(self, **kwargs):
         load = np.random.random() < self.load_chance
         if load:
-            print('loading')
+            #print('loading')
             if not self.ever_reset:
                 obs = self.env.reset(**kwargs)    
             self.env.unwrapped.rle.loadStateFromFile("./states/730.txt")
