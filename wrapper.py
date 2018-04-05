@@ -59,7 +59,7 @@ class StateSaver(gym.Wrapper):
     def _reset(self, **kwargs):
         load = np.random.random() < self.load_chance
         if self.save_count > 0 and load:
-            # print('loading')
+            print('loading')
             self.step_count = self.saved_step
             self.env.unwrapped.rle.loadState()
             self.save_count = self.save_count - 1
@@ -92,7 +92,7 @@ class StateSaver2(gym.Wrapper):
     def _reset(self, **kwargs):
         load = np.random.random() < self.load_chance
         if load:
-            #print('loading')
+            print('loading')
             if not self.ever_reset:
                 obs = self.env.reset(**kwargs)    
             self.env.unwrapped.rle.loadStateFromFile("./states/730.txt")

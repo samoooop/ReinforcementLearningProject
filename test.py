@@ -17,6 +17,8 @@ from baselines import bench
 from baselines.common import set_global_seeds
 from wrapper import *
 
+import numpy as np
+
 def make_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0):
     """
     Create a wrapped, monitored SubprocVecEnv for Atari.
@@ -36,8 +38,18 @@ def make_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0):
     set_global_seeds(seed)
     return SubprocVecEnv([make_env(i + start_index) for i in range(num_env)])
 
-env = make_env('GradiusIiiDeterministic-v0', 8, 0)
+env = make_env('GradiusIiiDeterministic-v0', 6, 0)
+# env = gym.make('GradiusIiiDeterministic-v0')
+# env = StateSaver2(env, load_chance = 0.5)
+# env = EpisodicWrapper(env)
+# env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
+# env = MaxAndSkipEnv(env, skip=4)
+# env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
 env.reset()
-for i in range(10000):
-    obs, rews, dones, infos = env.step(np.zeros(8, dtype = np.int))
-    print(obs.shape, i, dones)
+for i in range(1000):
+    # obs, _, dones, _, = env.step(0)
+    actions = np.random.random_integers(size=(8,), low = 0, high = 19)
+    obs, rews, dones, infos = env.step(actions)
+    print(obs.shape, i, dones, actions)
+    # if dones:
+    #     env.reset()
