@@ -82,14 +82,13 @@ class RealtimeEnv(VecEnv):
 
     def step_wait(self):
         results = []
-        sleep(1/self.tick_rate)
-        for i, remote in zip(range(self.nenvs), self.remotes):
-            if self.ready[i]:
-                self.expecting_actions[i] = True
-                results.append(remote.recv())
+        while len(results) == 0: # no point to return nothing
+            sleep(1/self.tick_rate)
+            for i, remote in zip(range(self.nenvs), self.remotes):
+                if self.ready[i]:
+                    self.expecting_actions[i] = True
+                    results.append(remote.recv())
         self.waiting = False
-        if len(results) == 0:
-            return self.step_wait()
         return results
         # obs, rews, dones, infos = zip(*results)
         #return np.stack(obs), np.stack(rews), np.stack(dones), infos

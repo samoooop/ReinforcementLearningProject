@@ -54,10 +54,10 @@ def make_realtime_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0)
             # print('xxxxxx', env.observation_space)
             env = StateSaver2(env, load_chance = 0.5)
             env = EpisodicWrapper(env)
-            env = WrapFrame(env)
-            env = MaxAndSkipEnv(env, skip=4)
+            #env = WrapFrame(env)
+            #env = MaxAndSkipEnv(env, skip=4)
             # print('xxxxxx', env.observation_space)
-            # env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
+            env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
             env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
             return env
         return _thunk

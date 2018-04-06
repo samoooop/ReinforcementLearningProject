@@ -22,11 +22,11 @@ def main():
     parser.add_argument('--dueling', type=int, default=1)
     parser.add_argument('--num-timesteps', type=int, default=int(5e6))
     args = parser.parse_args()
-    save_dir = './logs/12x_4skip/'
+    save_dir = './logs/8x_noskip_4stack-512batchsize-500kmem/'
     logger.configure(dir = save_dir)
     set_global_seeds(args.seed)
     # env = make_env(dying_penalty = 0)
-    env = make_realtime_env('GradiusIii-v0', 12, 0)
+    env = make_realtime_env('GradiusIii-v0', 8, 0)
     print(logger.get_dir())
     
     # env = MaxAndSkipEnv(env, skip = 3)
@@ -40,10 +40,11 @@ def main():
         q_func=model,
         lr=1e-4,
         max_timesteps=args.num_timesteps,
-        buffer_size=100000,
-        exploration_fraction=0.6,
+        buffer_size=500000,
+        exploration_fraction=0.4,
         exploration_final_eps=0.01,
         train_freq=1,
+        batch_size=128,
         learning_starts=10000,
         target_network_update_freq=5000,
         gamma=0.9,
