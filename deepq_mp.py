@@ -252,14 +252,17 @@ def learn(env,
             # print(len(episode_rewards))
             # Store transition in the replay buffer.
             any_done = False
+            obs = []
             for result in results:
                 ob, action, rew, new_ob, done, total_rew = result
                 replay_buffer.add(ob, action, rew, new_ob, done)
+                obs.append(ob)
                 if done:
                     episode_rewards.append(total_rew)
                     reset = True
                     any_done = True
             t += len(results)
+            obs = np.array(obs)
             done = any_done
 
             if t > learning_starts and t % train_freq == 0:
