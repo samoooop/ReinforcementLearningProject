@@ -222,6 +222,7 @@ def learn(env,
         model_file = os.path.join(td, "model")
         print("saving to ", model_file)
         t = 0
+        last_checkpoint = 0
         while t < max_timesteps:
             if callback is not None:
                 if callback(locals(), globals()):
@@ -292,7 +293,8 @@ def learn(env,
                 logger.dump_tabular()
             #TODO make it better 
             if (checkpoint_freq is not None and t > learning_starts and
-                    num_episodes > 100 and t % checkpoint_freq == 0):
+                    num_episodes > 100 and t > last_checkpoint):
+                last_checkpoint += checkpoint_freq
                 act.save(logger.get_dir() + str(t))
                 if saved_mean_reward is None or mean_100ep_reward > saved_mean_reward:
                     if print_freq is not None:
