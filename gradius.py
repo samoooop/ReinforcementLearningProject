@@ -25,7 +25,7 @@ def main():
     logger.configure(dir = save_dir)
     set_global_seeds(args.seed)
     # env = make_env(dying_penalty = 0)
-    env = make_env('GradiusIiiDeterministic-v0')
+    env = make_env()
     print(logger.get_dir())
     
     # env = MaxAndSkipEnv(env, skip = 3)

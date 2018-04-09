@@ -10,7 +10,7 @@ class SurviveEnv(gym.RewardWrapper):
 
 class EpisodicWrapper(gym.Wrapper):
     
-    def __init__(self, env, dying_penalty = 0):
+    def __init__(self, env, dying_penalty = 0.):
         gym.Wrapper.__init__(self, env)
         self.lives = 0
         self.dying_penalty = dying_penalty
@@ -22,6 +22,7 @@ class EpisodicWrapper(gym.Wrapper):
         if lives < self.lives:
             done = True
             # if die reduce the reward
+            # print(reward, self.dying_penalty)
             reward -= self.dying_penalty
         self.lives = lives
         return obs, reward, done, info
