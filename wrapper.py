@@ -3,6 +3,7 @@ import numpy as np
 from skimage.io import imsave
 import cv2
 from gym import spaces
+from os import listdir
 
 class SurviveEnv(gym.RewardWrapper):
     def _reward(self, reward):
@@ -101,6 +102,36 @@ class StateSaver2(gym.Wrapper):
             obs = self.env.reset(**kwargs)
         obs, _, _, _ = self.env.step(0)
         return obs
+
+class StateLoader(gym.Wrapper):
+    def __init__(self, env, load_chance = 0.5, path = 'states/'):
+        gym.Wrapper.__init__(self, env)
+        self.load_chance = load_chance
+        self.ever_reset = False
+        self.path = path
+        self.states = []
+        # state should not contain extension
+        for fn in listdir(path): 
+            if '.' not in fn:
+                self.states.append(fn)
+        self.nstates = len(self.states)
+        print('Loadable states' + str(listdir(path)))
+
+    def _step(self, action):
+        obs, reward, done, info = self.env.step(action)
+        return obs, reward, done, info
+
+    def _reset(self, **kwargs):
+        load = np.random.randint(low = 0, high = self.nstates + 1)
+        if load is self.nstates: # just reset
+            #print('loading')
+            obs = self.env.reset(**kwargs)
+        else:
+            if not self.ever_reset:
+                obs = self.env.reset(**kwargs)    
+            self.env.unwrapped.rle.loadStateFromFile(self.path + self.states[load])
+        return obs
+
 
 class WrapFrame(gym.ObservationWrapper):
     def __init__(self, env):
