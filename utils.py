@@ -14,11 +14,11 @@ import numpy as np
 
 def make_env(dying_penalty = 0):
     env = gym.make('GradiusIiiDeterministic-v0')
-    env = StateSaver2(env, load_chance = 0.5)
+    env = StateLoader(env)
     env = EpisodicWrapper(env, dying_penalty = dying_penalty)
     env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
-    env = MaxAndSkipEnv(env, skip=2)
-    env = AutoShootWrapper(env)
+    # env = MaxAndSkipEnv(env, skip=4)
+    # env = AutoShootWrapper(env)
     env = bench.Monitor(env, logger.get_dir())
     return env
 
