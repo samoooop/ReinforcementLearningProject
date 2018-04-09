@@ -22,11 +22,11 @@ def main():
     parser.add_argument('--dueling', type=int, default=1)
     parser.add_argument('--num-timesteps', type=int, default=int(5e6))
     args = parser.parse_args()
-    save_dir = './logs/8x_noskip_4stack-512batchsize-500kmem/'
+    save_dir = './logs/4x_4skip_4stack-128batchsize-100kmem_stateloader/'
     logger.configure(dir = save_dir)
     set_global_seeds(args.seed)
     # env = make_env(dying_penalty = 0)
-    env = make_realtime_env('GradiusIii-v0', 8, 0)
+    env = make_realtime_env('GradiusIiiDeterministic-v0', 8, 0)
     print(logger.get_dir())
     
     # env = MaxAndSkipEnv(env, skip = 3)
@@ -40,14 +40,15 @@ def main():
         q_func=model,
         lr=1e-4,
         max_timesteps=args.num_timesteps,
-        buffer_size=500000,
+        buffer_size=100000,
         exploration_fraction=0.4,
         exploration_final_eps=0.01,
         train_freq=1,
         batch_size=128,
+        param_noise = True,
         learning_starts=10000,
         target_network_update_freq=5000,
-        gamma=0.9,
+        gamma=0.99,
         prioritized_replay=bool(args.prioritized)
     )
     act.save(save_dir + "gradius_model.pkl") 

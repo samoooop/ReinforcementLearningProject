@@ -83,7 +83,7 @@ class RealtimeEnv(VecEnv):
     def step_wait(self):
         results = []
         while len(results) == 0: # no point to return nothing
-            sleep(1/self.tick_rate)
+            sleep(1./self.tick_rate)
             for i, remote in zip(range(self.nenvs), self.remotes):
                 if self.ready[i]:
                     self.expecting_actions[i] = True
