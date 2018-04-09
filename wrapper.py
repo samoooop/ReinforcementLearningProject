@@ -115,7 +115,8 @@ class StateLoader(gym.Wrapper):
                 self.states.append(fn)
         self.nstates = len(self.states)
         print('Loadable states' + str(listdir(path)))
-
+        print('action list', self.env.unwrapped.get_action_meanings())
+    
     def _step(self, action):
         obs, reward, done, info = self.env.step(action)
         return obs, reward, done, info
