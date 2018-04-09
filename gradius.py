@@ -21,11 +21,11 @@ def main():
     parser.add_argument('--dueling', type=int, default=1)
     parser.add_argument('--num-timesteps', type=int, default=int(1e6))
     args = parser.parse_args()
-    save_dir = './logs/8x_autoshoot_nopenalty/'
+    save_dir = './logs/2skip_3m_pram_noise_minaction/'
     logger.configure(dir = save_dir)
     set_global_seeds(args.seed)
     # env = make_env(dying_penalty = 0)
-    env = make_subproc_env('GradiusIiiDeterministic-v0', 5, 0)
+    env = make_env('GradiusIiiDeterministic-v0')
     print(logger.get_dir())
     
     # env = MaxAndSkipEnv(env, skip = 3)
@@ -43,9 +43,10 @@ def main():
         exploration_fraction=0.6,
         exploration_final_eps=0.01,
         train_freq=1,
+        param_noise=True,
         learning_starts=10000,
         target_network_update_freq=5000,
-        gamma=0.9,
+        gamma=0.99,
         prioritized_replay=bool(args.prioritized)
     )
     act.save(save_dir + "gradius_model_8x.pkl") 
