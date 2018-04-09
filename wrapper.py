@@ -104,9 +104,8 @@ class StateSaver2(gym.Wrapper):
         return obs
 
 class StateLoader(gym.Wrapper):
-    def __init__(self, env, load_chance = 0.5, path = 'states/'):
+    def __init__(self, env, path = 'states/'):
         gym.Wrapper.__init__(self, env)
-        self.load_chance = load_chance
         self.ever_reset = False
         self.path = path
         self.states = []
@@ -127,9 +126,11 @@ class StateLoader(gym.Wrapper):
             #print('loading')
             obs = self.env.reset(**kwargs)
         else:
+            # print(self.states[load])
             if not self.ever_reset:
                 obs = self.env.reset(**kwargs)    
             self.env.unwrapped.rle.loadStateFromFile(self.path + self.states[load])
+            obs, _, _, _ = self.env.step(0)
         return obs
 
 
@@ -216,6 +217,7 @@ class WrapAndSaveFrame(gym.ObservationWrapper):
 class AutoShootWrapper(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
+        print(self.env.unwrapped.get_action_meanings())
         self.action_space = spaces.Discrete(5)
         self.action_map = [2, 5, 3, 13, 7]
 
