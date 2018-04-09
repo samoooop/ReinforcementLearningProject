@@ -185,7 +185,7 @@ class AutoShootWrapper(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
         self.action_space = spaces.Discrete(5)
-        self.action_map = [2, 5, 3, 15, 7]
+        self.action_map = [2, 5, 3, 13, 7]
 
     def _step(self, action):
         action = self.action_map[action]
