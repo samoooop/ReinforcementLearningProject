@@ -12,7 +12,7 @@ from baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
 from realtime_env import RealtimeEnv
 import numpy as np
 
-def make_env(dying_penalty = 1000):
+def make_env(dying_penalty = 0):
     env = gym.make('GradiusIiiDeterministic-v0')
     env = StateSaver2(env, load_chance = 0.5)
     env = EpisodicWrapper(env, dying_penalty = dying_penalty)
@@ -31,7 +31,7 @@ def make_subproc_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0):
         def _thunk():
             env = gym.make(env_id)
             env.seed(seed + rank)
-            env = StateSaver2(env, load_chance = 0.5)
+            # env = StateSaver2(env, load_chance = 0.5)
             env = EpisodicWrapper(env)
             env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
             env = MaxAndSkipEnv(env, skip=4)
@@ -54,10 +54,10 @@ def make_realtime_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0)
             # print('xxxxxx', env.observation_space)
             env = StateSaver2(env, load_chance = 0.5)
             env = EpisodicWrapper(env)
-            #env = WrapFrame(env)
-            #env = MaxAndSkipEnv(env, skip=4)
+            env = WrapFrame(env)
+            env = MaxAndSkipEnv(env, skip=4)
             # print('xxxxxx', env.observation_space)
-            env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
+            # env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
             env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
             return env
         return _thunk

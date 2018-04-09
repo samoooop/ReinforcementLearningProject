@@ -190,7 +190,7 @@ def learn(env,
     }
 
     act = ActWrapper(act, act_params)
-    
+
     # Create the replay buffer
     if prioritized_replay:
         replay_buffer = PrioritizedReplayBuffer(buffer_size, alpha=prioritized_replay_alpha)
@@ -210,17 +210,14 @@ def learn(env,
     # Initialize the parameters and copy them to the target network.
     U.initialize()
     update_target()
-    nenv = 5
-    current_episode_rewards = np.zeros(nenv)
-    episode_rewards = []
+
+    episode_rewards = [0.0]
     saved_mean_reward = None
     obs = env.reset()
     reset = True
-    # act = deepq.load("result/10mstep4stack7261random.pkl")
     with tempfile.TemporaryDirectory() as td:
         model_saved = False
         model_file = os.path.join(td, "model")
-        print("saving to ", model_file)
         for t in range(max_timesteps):
             if callback is not None:
                 if callback(locals(), globals()):
@@ -240,25 +237,19 @@ def learn(env,
                 kwargs['reset'] = reset
                 kwargs['update_param_noise_threshold'] = update_param_noise_threshold
                 kwargs['update_param_noise_scale'] = True
-            #print('act')
-            actions = act(np.array(obs), update_eps=update_eps, **kwargs)
-            #print(actions)
-            env_actions = actions
+            action = act(np.array(obs)[None], update_eps=update_eps, **kwargs)[0]
+            env_action = action
             reset = False
-            #print('s')
-            new_obss, rews, dones, _ = env.step(env_actions)
-            #print('e')
-            # print(len(episode_rewards))
+            new_obs, rew, done, _ = env.step(env_action)
             # Store transition in the replay buffer.
-            for i in range(nenv):
-                replay_buffer.add(obs[i], actions[i], rews[i], new_obss[i], float(dones[i]))
-                current_episode_rewards[i] += rews[i]
-                if dones[i]:
-                    episode_rewards.append(current_episode_rewards[i])
-                    current_episode_rewards[i] = 0
-                    reset = True
-            done = np.any(dones)
-            obs = new_obss
+            replay_buffer.add(obs, action, rew, new_obs, float(done))
+            obs = new_obs
+
+            episode_rewards[-1] += rew
+            if done:
+                obs = env.reset()
+                episode_rewards.append(0.0)
+                reset = True
 
             if t > learning_starts and t % train_freq == 0:
                 # Minimize the error in Bellman's equation on a batch sampled from replay buffer.
@@ -285,10 +276,9 @@ def learn(env,
                 logger.record_tabular("mean 100 episode reward", mean_100ep_reward)
                 logger.record_tabular("% time spent exploring", int(100 * exploration.value(t)))
                 logger.dump_tabular()
-            #TODO make it better 
+
             if (checkpoint_freq is not None and t > learning_starts and
                     num_episodes > 100 and t % checkpoint_freq == 0):
-                act.save(logger.get_dir() + str(t))
                 if saved_mean_reward is None or mean_100ep_reward > saved_mean_reward:
                     if print_freq is not None:
                         logger.log("Saving model due to mean reward increase: {} -> {}".format(
