@@ -18,7 +18,7 @@ def make_env(dying_penalty = 0):
     env = EpisodicWrapper(env, dying_penalty = dying_penalty)
     env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
     env = MaxAndSkipEnv(env, skip=4)
-    # env = AutoShootWrapper(env)
+    env = AutoShootWrapper(env)
     env = bench.Monitor(env, logger.get_dir())
     return env
 
