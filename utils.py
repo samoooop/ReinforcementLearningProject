@@ -17,7 +17,7 @@ def make_env(dying_penalty = 0):
     env = StateLoader(env)
     env = EpisodicWrapper(env, dying_penalty = dying_penalty)
     env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
-    # env = MaxAndSkipEnv(env, skip=4)
+    env = MaxAndSkipEnv(env, skip=4)
     # env = AutoShootWrapper(env)
     env = bench.Monitor(env, logger.get_dir())
     return env
@@ -51,12 +51,10 @@ def make_realtime_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0)
         def _thunk():
             env = gym.make(env_id)
             env.seed(seed + rank)
-            # print('xxxxxx', env.observation_space)
             env = StateLoader(env)
             env = EpisodicWrapper(env)
             env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
             env = MaxAndSkipEnv(env, skip=4)
-            # print('xxxxxx', env.observation_space)
             env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
             return env
         return _thunk

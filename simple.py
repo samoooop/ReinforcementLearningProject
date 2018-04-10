@@ -279,7 +279,7 @@ def learn(env,
 
             if (checkpoint_freq is not None and t > learning_starts and
                     num_episodes > 100 and t % checkpoint_freq == 0):
-                act.save(logger.get_dir(), "%d" % t)
+                act.save(logger.get_dir() + ("%d" % t))
                 if saved_mean_reward is None or mean_100ep_reward > saved_mean_reward:
                     if print_freq is not None:
                         logger.log("Saving model due to mean reward increase: {} -> {}".format(
