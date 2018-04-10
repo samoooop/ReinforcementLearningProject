@@ -216,6 +216,7 @@ def learn(env,
     saved_mean_reward = None
     obs = env.reset()
     reset = True
+    ntrain = 0
     # act = deepq.load("result/10mstep4stack7261random.pkl")
     with tempfile.TemporaryDirectory() as td:
         model_saved = False
@@ -263,6 +264,7 @@ def learn(env,
                     reset = True
                     any_done = True
             t += len(results)
+            ntrain += 1
             obs = np.array(obs)
             done = any_done
 
@@ -287,6 +289,7 @@ def learn(env,
             num_episodes = len(episode_rewards)
             if done and print_freq is not None and len(episode_rewards) % print_freq == 0:
                 logger.record_tabular("steps", t)
+                logger.record_tabular("ntrain", ntrain)
                 logger.record_tabular("episodes", num_episodes)
                 logger.record_tabular("mean 100 episode reward", mean_100ep_reward)
                 logger.record_tabular("% time spent exploring", int(100 * exploration.value(t)))
