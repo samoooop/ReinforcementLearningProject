@@ -1,11 +1,11 @@
 import gym
 import gym_rle
 from wrapper import *
-from utils import make_env, make_subproc_env
+from utils import make_realtime_env_with_one_state
 
 from baselines.common.atari_wrappers import wrap_deepmind
 from baselines import deepq
-from simple import learn
+from deepq_mp import learn
 from baselines.common import set_global_seeds
 from baselines import bench
 import argparse
@@ -20,11 +20,11 @@ def main():
     parser.add_argument('--dueling', type=int, default=1)
     parser.add_argument('--num-timesteps', type=int, default=int(2e6))
     args = parser.parse_args()
-    save_dir = './logs/4skip_3m_pram_noise_state_loader_newactionset_2xmodel_minaction/'
+    save_dir = './logs/2state_realtime'
     logger.configure(dir = save_dir)
     set_global_seeds(args.seed)
     # env = make_env(dying_penalty = 0)
-    env = make_env()
+    env = make_realtime_env_with_one_state('GradiusIiiDeterministic-v0', 0)
     print(logger.get_dir())
     
     # env = MaxAndSkipEnv(env, skip = 3)
@@ -42,7 +42,7 @@ def main():
         exploration_fraction=0.6,
         exploration_final_eps=0.01,
         train_freq=1,
-        param_noise=True,
+        param_noise = True,
         learning_starts=10000,
         target_network_update_freq=5000,
         gamma=0.99,

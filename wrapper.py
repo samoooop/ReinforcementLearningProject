@@ -133,6 +133,28 @@ class StateLoader(gym.Wrapper):
             self.env.unwrapped.rle.loadStateFromFile(self.path + self.states[load])
             obs, _, _, _ = self.env.step(0)
         return obs
+    
+class OneStateLoader(gym.Wrapper):
+    def __init__(self, env, path = None):
+        gym.Wrapper.__init__(self, env)
+        self.path = path
+        self.ob = None
+        if self.path is not None:
+            self.ob = self.env.reset()
+        print('Loading State at ' + str(path))
+        print('action list ', self.env.unwrapped.get_action_meanings())
+    
+    def _step(self, action):
+        obs, reward, done, info = self.env.step(action)
+        return obs, reward, done, info
+
+    def _reset(self, **kwargs):
+        if self.path is None:
+            self.ob = self.env.reset(**kwargs)
+        else:  
+            self.env.unwrapped.rle.loadStateFromFile(self.path)
+            self.ob, _, _, _ = self.env.step(0)
+        return self.ob
 
 
 class WrapFrame(gym.ObservationWrapper):
