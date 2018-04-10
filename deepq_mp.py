@@ -303,7 +303,7 @@ def learn(env,
                     if print_freq is not None:
                         logger.log("Saving model due to mean reward increase: {} -> {}".format(
                                    saved_mean_reward, mean_100ep_reward))
-                    act.save(logger.get_dir() + 'current_max.pkl')
+                    act.save(logger.get_dir() + '/current_max.pkl')
                     save_state(model_file)
                     model_saved = True
                     saved_mean_reward = mean_100ep_reward
