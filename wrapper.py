@@ -219,8 +219,8 @@ class AutoShootWrapper(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
         print(self.env.unwrapped.get_action_meanings())
-        self.action_space = spaces.Discrete(5)
-        self.action_map = [2, 5, 3, 13, 7]
+        self.action_map = [2, 4, 6, 8, 10, 12, 14, 16, 18, 19]
+        self.action_space = spaces.Discrete(len(self.action_map))
 
     def _step(self, action):
         action = self.action_map[action]
