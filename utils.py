@@ -18,7 +18,7 @@ def make_env(dying_penalty = 0):
     env = EpisodicWrapper(env, dying_penalty = dying_penalty)
     env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
     env = MaxAndSkipEnv(env, skip=4)
-    env = AutoShootWrapper(env)
+    # env = AutoShootWrapper(env)
     env = bench.Monitor(env, logger.get_dir())
     return env
 
@@ -34,7 +34,7 @@ def make_subproc_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0):
             # env = StateSaver2(env, load_chance = 0.5)
             env = EpisodicWrapper(env)
             env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
-            env = MaxAndSkipEnv(env, skip=4)
+            env = MaxAndSkipEnv(env, skip=2)
             # env = AutoShootWrapper(env)
             env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
             return env
@@ -48,10 +48,11 @@ def make_realtime_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0)
         def _thunk():
             env = gym.make(env_id)
             env.seed(seed + rank)
-            env = StateLoader(env)
+            env = StateLoader(env, path = 'states/')
             env = EpisodicWrapper(env)
-            env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
-            env = MaxAndSkipEnv(env, skip=4)
+            env = WrapFrame(env)
+            # env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
+            env = MaxAndSkipEnv(env, skip=2)
             env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
             return env
         return _thunk
@@ -67,9 +68,10 @@ def make_realtime_env_with_one_state(env_id, seed, path = 'states/', wrapper_kwa
     for fn in listdir(path): 
         if '.' not in fn:
             states.append(path + fn)
+            print(path + fn)
     print('Loadable states ' + str(listdir(path)))
     # appending none which represent just reset the env
-    states.append(None)
+    # states.append(None)
     num_env = len(states)
     
     if wrapper_kwargs is None: wrapper_kwargs = {}
@@ -79,8 +81,9 @@ def make_realtime_env_with_one_state(env_id, seed, path = 'states/', wrapper_kwa
             env.seed(seed + rank)
             env = OneStateLoader(env, state_path)
             env = EpisodicWrapper(env)
-            env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
-            env = MaxAndSkipEnv(env, skip=4)
+            env = WrapFrame(env)
+            # env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
+            # env = MaxAndSkipEnv(env, skip=4)
             env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
             return env
         return _thunk

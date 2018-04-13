@@ -257,8 +257,8 @@ def learn(env,
             obs = []
             for result in results:
                 ob, action, rew, new_ob, done, total_rew = result
-                replay_buffer.add(ob, action, rew, new_ob, done)
-                obs.append(ob)
+                replay_buffer.add(ob, action, rew, new_ob, float(done))
+                obs.append(new_ob)
                 if done:
                     episode_rewards.append(total_rew)
                     reset = True
