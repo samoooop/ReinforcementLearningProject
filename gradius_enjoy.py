@@ -15,11 +15,12 @@ def main():
     
     env = WrapFrame(env)
     env = MaxAndSkipEnv(env, skip=2)
-    env = EndingSaver(env)
+    env = FrameStack(env, 4)
+    # env = EndingSaver(env)
     # env = ObservationSaver(env)
     print(env.observation_space)
     # env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
-    act = deepq.load("saved_model/current_max_2m.pkl")
+    act = deepq.load("result/current_max.pkl")
     sum_rew = 0
     neps = 5000
     fps = None
