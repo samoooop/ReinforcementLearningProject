@@ -20,7 +20,7 @@ def main():
     parser.add_argument('--dueling', type=int, default=1)
     parser.add_argument('--num-timesteps', type=int, default=int(2e6))
     args = parser.parse_args()
-    save_dir = './logs/4skip_3m_pram_noise_state_loader_newactionset_2xmodel_minaction/'
+    save_dir = './logs/2skipthen4stack_2m_paramnoise_2xmodel/'
     logger.configure(dir = save_dir)
     set_global_seeds(args.seed)
     # env = make_env(dying_penalty = 0)

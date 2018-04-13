@@ -14,6 +14,8 @@ import numpy as np
 
 def make_env(dying_penalty = 0):
     env = gym.make('GradiusIiiDeterministic-v0')
+    env = EpisodicWrapper(env)
+    env = StateLoader(env, path = 'states/')
     env = WrapFrame(env)
     env = MaxAndSkipEnv(env, skip=2)
     env = FrameStack(env, 4)
