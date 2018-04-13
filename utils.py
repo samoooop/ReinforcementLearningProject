@@ -4,7 +4,7 @@ import os
 from wrapper import *
 
 from baselines import logger
-from baselines.common.atari_wrappers import wrap_deepmind, make_atari, MaxAndSkipEnv
+from baselines.common.atari_wrappers import wrap_deepmind, make_atari, MaxAndSkipEnv, FrameStack
 from baselines import bench
 from baselines.common import set_global_seeds
 from baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
@@ -14,11 +14,9 @@ import numpy as np
 
 def make_env(dying_penalty = 0):
     env = gym.make('GradiusIiiDeterministic-v0')
-    env = StateLoader(env)
-    env = EpisodicWrapper(env, dying_penalty = dying_penalty)
-    env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
-    env = MaxAndSkipEnv(env, skip=4)
-    # env = AutoShootWrapper(env)
+    env = WrapFrame(env)
+    env = MaxAndSkipEnv(env, skip=2)
+    env = FrameStack(env, 4)
     env = bench.Monitor(env, logger.get_dir())
     return env
 
