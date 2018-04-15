@@ -20,13 +20,13 @@ def main():
     parser.add_argument('--seed', help='RNG seed', type=int, default=0)
     parser.add_argument('--prioritized', type=int, default=1)
     parser.add_argument('--dueling', type=int, default=1)
-    parser.add_argument('--num-timesteps', type=int, default=int(10e6))
+    parser.add_argument('--num-timesteps', type=int, default=int(50e6))
     args = parser.parse_args()
-    save_dir = './logs/2skipthen4stack_10m_128batch_200hz_112x112__paramnoise_manystate_witheval-2'
+    save_dir = './logs/2skipthen4stack_50m_128batch_200hz_112x112__paramnoise_manystate_witheval-2'
     logger.configure(dir = save_dir)
     set_global_seeds(args.seed)
     # env = make_env(dying_penalty = 0)
-    env = make_realtime_env_with_eval('GradiusIiiDeterministic-v0', 16, 0)
+    env = make_realtime_env_with_eval('GradiusIiiDeterministic-v0', 32, 0)
     print(logger.get_dir())
     model = deepq.models.cnn_to_mlp(
         convs=[(128, 8, 4), (64, 4, 2), (64, 3, 1)],

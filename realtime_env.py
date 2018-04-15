@@ -10,11 +10,12 @@ def worker(remote, parent_remote, env_fn_wrapper, ready, rank):
     # maybe it shouldn't be None
     ob = None
     total_rew = 0
+    render = False
     while True:
         cmd, data = remote.recv()
         if cmd == 'step':
             new_ob, reward, done, info = env.step(data)
-            if is_eval:
+            if is_eval and render:
                 env.render()
             if done:
                 new_ob = env.reset()
