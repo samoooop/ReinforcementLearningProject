@@ -161,8 +161,8 @@ class WrapFrame(gym.ObservationWrapper):
     def __init__(self, env):
         """Warp frames to 84x84 as done in the Nature paper and later work."""
         gym.ObservationWrapper.__init__(self, env)
-        self.width = 84
-        self.height = 84
+        self.width = 112
+        self.height = 112
         self.observation_space = spaces.Box(low=0, high=255, shape=(self.height, self.width, 1))
 
     def _observation(self, frame):

@@ -6,7 +6,7 @@ from time import sleep
 def worker(remote, parent_remote, env_fn_wrapper, ready, rank):
     np.random.seed(rank * 1000)
     parent_remote.close()
-    env = env_fn_wrapper.x()
+    env, is_eval = env_fn_wrapper.x()
     # maybe it shouldn't be None
     ob = None
     total_rew = 0
@@ -14,11 +14,13 @@ def worker(remote, parent_remote, env_fn_wrapper, ready, rank):
         cmd, data = remote.recv()
         if cmd == 'step':
             new_ob, reward, done, info = env.step(data)
+            if is_eval:
+                env.render()
             if done:
                 new_ob = env.reset()
             ready[rank] = 1
             total_rew += reward
-            remote.send((ob, data, reward, new_ob, done, total_rew))
+            remote.send((ob, data, reward, new_ob, done, total_rew, is_eval))
             total_rew = 0 if done else total_rew
             ob = new_ob
             
@@ -47,7 +49,7 @@ class RealtimeEnv(VecEnv):
         """
         envs: list of gym environments to run in subprocesses
         """
-        self.tick_rate = 100
+        self.tick_rate = 200
         self.waiting = False
         self.closed = False
         nenvs = len(env_fns)

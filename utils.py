@@ -42,22 +42,33 @@ def make_subproc_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0):
     set_global_seeds(seed)
     return SubprocVecEnv([make_env(i + start_index) for i in range(num_env)])
 
-def make_realtime_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0):
+def make_realtime_env_with_eval(env_id, num_env, seed, wrapper_kwargs=None, start_index=0):
     if wrapper_kwargs is None: wrapper_kwargs = {}
+    def make_eval_env(rank):
+        def _thunk():
+            env = gym.make(env_id)
+            env.seed(seed + rank)
+            env = EpisodicWrapper(env)
+            env = WrapFrame(env)
+            env = MaxAndSkipEnv(env, skip=2)
+            env = FrameStack(env, 4)
+            env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
+            return env, True
+        return _thunk
     def make_env(rank): # pylint: disable=C0111
         def _thunk():
             env = gym.make(env_id)
             env.seed(seed + rank)
-            env = StateLoader(env, path = 'states/')
             env = EpisodicWrapper(env)
+            env = StateLoader(env, path = 'states/')
             env = WrapFrame(env)
-            # env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
             env = MaxAndSkipEnv(env, skip=2)
+            env = FrameStack(env, 4)
             env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
-            return env
+            return env, False
         return _thunk
     set_global_seeds(seed)
-    return RealtimeEnv([make_env(i + start_index) for i in range(num_env)])
+    return RealtimeEnv([make_eval_env(0)] + [make_env(i + start_index) for i in range(1, num_env)])
 
 def make_realtime_env_with_one_state(env_id, seed, path = 'states/', wrapper_kwargs=None, start_index=0):
     """

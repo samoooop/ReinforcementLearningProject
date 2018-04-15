@@ -213,6 +213,7 @@ def learn(env,
     nenv = 5
     current_episode_rewards = np.zeros(nenv)
     episode_rewards = []
+    eval_episode_rewards = []
     saved_mean_reward = None
     obs = env.reset()
     reset = True
@@ -256,10 +257,12 @@ def learn(env,
             any_done = False
             obs = []
             for result in results:
-                ob, action, rew, new_ob, done, total_rew = result
+                ob, action, rew, new_ob, done, total_rew, is_eval = result
                 replay_buffer.add(ob, action, rew, new_ob, float(done))
                 obs.append(new_ob)
                 if done:
+                    if is_eval:
+                        eval_episode_rewards.append(total_rew)
                     episode_rewards.append(total_rew)
                     reset = True
                     any_done = True
@@ -287,26 +290,31 @@ def learn(env,
 
             mean_100ep_reward = round(np.mean(episode_rewards[-101:-1]), 1)
             num_episodes = len(episode_rewards)
+            
+            mean_eval_30ep_reward = round(np.mean(eval_episode_rewards[-31:-1]), 1)
+            num_eval_episodes = len(eval_episode_rewards)
+            
             if done and print_freq is not None and len(episode_rewards) % print_freq == 0:
                 logger.record_tabular("steps", t)
                 logger.record_tabular("ntrain", ntrain)
                 logger.record_tabular("episodes", num_episodes)
+                logger.record_tabular("eval episodes", num_eval_episodes)
                 logger.record_tabular("mean 100 episode reward", mean_100ep_reward)
+                logger.record_tabular("mean 30 eval episode reward", mean_eval_30ep_reward)
                 logger.record_tabular("% time spent exploring", int(100 * exploration.value(t)))
                 logger.dump_tabular()
             #TODO make it better 
             if (checkpoint_freq is not None and t > learning_starts and
                     num_episodes > 100 and t > last_checkpoint):
                 last_checkpoint += checkpoint_freq
-                
-                if saved_mean_reward is None or mean_100ep_reward > saved_mean_reward:
+                if saved_mean_reward is None or mean_eval_30ep_reward > saved_mean_reward:
                     if print_freq is not None:
                         logger.log("Saving model due to mean reward increase: {} -> {}".format(
-                                   saved_mean_reward, mean_100ep_reward))
+                                   saved_mean_reward, mean_eval_30ep_reward))
                     act.save(logger.get_dir() + '/current_max.pkl')
                     save_state(model_file)
                     model_saved = True
-                    saved_mean_reward = mean_100ep_reward
+                    saved_mean_reward = mean_eval_30ep_reward
         if model_saved:
             if print_freq is not None:
                 logger.log("Restored model with mean reward: {}".format(saved_mean_reward))
