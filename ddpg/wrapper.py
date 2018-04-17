@@ -257,12 +257,11 @@ class PropActionWrapper(gym.Wrapper):
         gym.Wrapper.__init__(self, env)
         #Todo change hard code 20 to actual naction
         self.naction =  20
-        self.action_space = spaces.Box(low = -1.0, high = 1, shape = (self.naction,))
+        self.action_space = spaces.Box(low = 0, high = 1, shape = (self.naction,))
     
     def _step(self, action):
         # turn score into prop
-        action = action + 1.
-        prop = action / np.sum(action)
+        prop = action
         take_action = np.random.choice(self.naction, 1, p = prop)[0]
         obs, reward, done, info = self.env.step(take_action)
         return obs, reward, done, info
