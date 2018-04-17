@@ -11,3 +11,6 @@ git clone https://github.com/openai/baselines
 cd baselines
 pip3 install -e .
 
+export LC_ALL="en_US.UTF-8"
+export LC_CTYPE="en_US.UTF-8"
+sudo dpkg-reconfigure locales

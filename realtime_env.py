@@ -50,7 +50,7 @@ class RealtimeEnv(VecEnv):
         """
         envs: list of gym environments to run in subprocesses
         """
-        self.tick_rate = 200
+        self.tick_rate = 100
         self.waiting = False
         self.closed = False
         nenvs = len(env_fns)

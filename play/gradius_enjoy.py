@@ -11,8 +11,12 @@ from pynput import keyboard
 from pynput.keyboard import Key
 import time
 
+from wrapper import *
+
+import sys
 from os.path import exists
 import numpy as np
+from skimage.io import imsave
 
 manager = Manager()
 keys = manager.dict()
@@ -74,22 +78,32 @@ def get_current_action():
     # if keys['d'] and keys['l'] and key['a']: action = 12
     if keys['a']: return 1
     if keys['b']: return 0
-    if keys['l']: return 5
-    if keys['r']: return 3
-    if keys['u']: return 13
-    if keys['d']: return 7
-    return 0
+    if keys['l']: return 6
+    if keys['r']: return 4
+    if keys['u']: return 14
+    if keys['d']: return 8
+    return 2
 
-def save_state(env, step):
+def save_state(env, step, obs):
     t = 0
-    while exists("./states/%d-%d" % (step, t)):
+    file_name = "./states/%d" % step
+    while exists(file_name):
         t+=1
-    env.unwrapped.rle.saveStateToFile("./states/%d-%d" % (step, t))
+    file_name = file_name + '-' + str(t)
+    env.unwrapped.rle.saveStateToFile(file_name)
+    im = obs
+    imsave(file_name + '.png', im)
+    print('saved to', file_name)
     
 def main():
     env = gym.make('GradiusIii-v0')
-    print(env.unwrapped.get_action_meanings())
-    # env = StateSaver2(env, load_chance = 0.5)
+    action_set = env.unwrapped.get_action_meanings()
+    for i, a in zip(range(len(action_set)), action_set):
+        print(i, a)
+
+    # env = WrapFrame(env)
+    # env = StateLoader(env)
+    # env = StateSaver2(env, load_chance = 1.0)
     # env = EpisodicWrapper(env)
     #env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
     #env = MaxAndSkipEnv(env, skip=4)
@@ -103,14 +117,15 @@ def main():
     sum_rew = 0
     for i in range(100):
         obs, done = env.reset(), False
+        print(sys.getsizeof(obs), obs.shape, type(obs), obs.nbytes)
         episode_rew = 0
         step = 0
         while not done:
             env.render(mode = 'human')
-            if keys['enter']:
-                save_state(env, step)
             a = get_current_action()
             obs, rew, done, _ = env.step(a)
+            if keys['enter']:
+                save_state(env, step, obs)
             episode_rew += rew
             time.sleep(1./fps)
             step += 1

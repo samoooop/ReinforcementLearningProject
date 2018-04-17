@@ -48,7 +48,7 @@ def make_realtime_env_with_eval(env_id, num_env, seed, wrapper_kwargs=None, star
         def _thunk():
             env = gym.make(env_id)
             env.seed(seed + rank)
-            env = EpisodicWrapper(env)
+            # env = EpisodicWrapper(env)
             env = WrapFrame(env)
             env = MaxAndSkipEnv(env, skip=2)
             env = FrameStack(env, 4)
