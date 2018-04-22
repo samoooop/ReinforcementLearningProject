@@ -1,3 +1,6 @@
 states/
 play/states
 logs/
+result/
+play/state_all
+play/states_old

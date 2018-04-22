@@ -180,8 +180,8 @@ class ObservationSaver(gym.Wrapper):
     def _step(self, action):
         obs, reward, done, info = self.env.step(action)
         if self.lastObservation is not None:
-            im = self.lastObservation.reshape((obs.shape[0], obs.shape[1]))
-            imsave("observations/{}.png".format(self.step_count), im)
+            # im = self.lastObservation.reshape((obs.shape[0], obs.shape[1]))
+            imsave("observations/{}.png".format(self.step_count), self.lastObservation)
         self.lastObservation = obs
         self.step_count = self.step_count + 1
         return obs, reward, done, info

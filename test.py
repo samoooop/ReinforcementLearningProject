@@ -19,6 +19,8 @@ from baselines.common import set_global_seeds
 from wrapper import *
 from realtime_env import RealtimeEnv
 import numpy as np
+from utils import *
+import time
 
 def make_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0):
     """
@@ -40,7 +42,14 @@ def make_env(env_id, num_env, seed, wrapper_kwargs=None, start_index=0):
     return RealtimeEnv([make_env(i + start_index) for i in range(num_env)])
 
 # env = make_env('GradiusIiiDeterministic-v0', 12, 0)
-env = gym.make('GradiusIii-v0')
+env = gym.make('GradiusIiiDeterministic-v0')
+env = EpisodicWrapper(env)
+env = StateLoader(env, path = 'states/')
+env = WrapFrame(env)
+#env = MaxAndSkipEnv(env, skip=2)
+env = FrameStack(env, 4)
+# env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
+# env = make_realtime_env_with_eval('GradiusIiiDeterministic-v0', 16, 0)
 # env = StateSaver2(env, load_chance = 0.5)
 # env = EpisodicWrapper(env)
 # env = wrap_deepmind(env, episode_life = False, clip_rewards = False, frame_stack = True)
@@ -50,17 +59,20 @@ obs = env.reset()
 # obs, rews, dones, infos = env.step(np.zeros(12, dtype = np.int))
 frame_count = 0
 # act = deepq.load("result/10mstep4stack7261random.pkl")
-for i in range(1000):
+nf = 0
+s = time.time()
+for i in range(10000):
     # actions = np.random.random_integers(size=(obs.shape[0],), low = 0, high = 19)
     # print(obs.shape)
-    #actions = act(obs[None])
+    #actions = act(obs[None]) 
     # print(actions)
 #     obs, rews, dones, infos = env.step(actions)
 #     frame_count += obs.shape[0]
 #     print(obs.shape, i, dones, actions)
-    
-    obs, _, dones, _, = env.step(0)
-    print(i, dones, obs.shape)
-    if dones:
-        obs = env.reset()
-print(frame_count)
+    env.step(np.random.random_integers(low=0, high=19))
+    #results = env.step(np.random.random_integers(low = 0,high = 19, size = (16,)))
+    nf += 1
+    # print(i, dones, obs.shape)
+    #if dones:
+    #    obs = env.reset()
+print(nf/(time.time() - s))

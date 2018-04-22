@@ -50,7 +50,7 @@ def make_realtime_env_with_eval(env_id, num_env, seed, wrapper_kwargs=None, star
             env.seed(seed + rank)
             # env = EpisodicWrapper(env)
             env = WrapFrame(env)
-            env = MaxAndSkipEnv(env, skip=2)
+            #env = MaxAndSkipEnv(env, skip=2)
             env = FrameStack(env, 4)
             env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
             return env, True
@@ -62,7 +62,7 @@ def make_realtime_env_with_eval(env_id, num_env, seed, wrapper_kwargs=None, star
             env = EpisodicWrapper(env)
             env = StateLoader(env, path = 'states/')
             env = WrapFrame(env)
-            env = MaxAndSkipEnv(env, skip=2)
+            #env = MaxAndSkipEnv(env, skip=2)
             env = FrameStack(env, 4)
             env = bench.Monitor(env, logger.get_dir() and os.path.join(logger.get_dir(), str(rank)))
             return env, False

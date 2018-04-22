@@ -18,9 +18,9 @@ def main():
     parser.add_argument('--seed', help='RNG seed', type=int, default=0)
     parser.add_argument('--prioritized', type=int, default=1)
     parser.add_argument('--dueling', type=int, default=1)
-    parser.add_argument('--num-timesteps', type=int, default=int(2e6))
+    parser.add_argument('--num-timesteps', type=int, default=int(3e6))
     args = parser.parse_args()
-    save_dir = './logs/2state_realtime'
+    save_dir = './logs/4state_realtime_2ndtry'
     logger.configure(dir = save_dir)
     set_global_seeds(args.seed)
     # env = make_env(dying_penalty = 0)
